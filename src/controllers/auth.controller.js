@@ -99,9 +99,17 @@ export const login = async (req , res) => {
     }
 }
 
-export const logout = (_,res) => {
-    res.cookie("jwt","",{maxAge:0});
-    res.status(200).json({message : "Logout successfully"})
+export const logout = (_, res) => {
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.clearCookie("jwt", {
+        httpOnly: true,
+        secure: isProduction, // هتبقى true على النت فالمتصفح يوافق يمسحها
+        sameSite: isProduction ? "none" : "lax", // لازم تطابق تماماً دالة الإنشاء
+        path: "/", 
+    });
+
+    return res.status(200).json({ message: "Logged out successfully" });
 };
 
 
